@@ -11,7 +11,7 @@ const usersGetAll = async (req = request, res = response) => {
         User.find({active:true}).skip(page*limit).limit(limit)
     ]);
 
-    res.json({
+    return res.json({
         total,
         users
     });
@@ -39,9 +39,8 @@ const usersPost = async (req = request, res = response) => {
     user.save();
 
     res.json({
-        msg: 'POST API',
         body: user
-    })
+    });
 };
 
 const usersPut = async (req = request, res = response) => {
