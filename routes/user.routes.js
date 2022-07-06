@@ -8,6 +8,7 @@ const {
 } = require('../helpers/db-validators.helper');
 
 const { validateFields } = require('../middlewares/validate-fields.middleware');
+const { validateJWT, validateJWTAdmin } = require('../middlewares/validar-jwt.middleware');
 
 const { 
     usersGetAll,
@@ -20,9 +21,14 @@ const {
 
 const router = Router();
 
-router.get('/', usersGetAll);
+router.get('/',
+    validateJWT,
+    validateFields,
+    usersGetAll
+);
 router.get('/:id', usersGet);
 router.post('/',
+    validateJWT,
     check('name', 'Name is required').not().isEmpty(),
     check('password', 'Password is required (length min 6 characters)').isLength({min: 6}),
     check('email', 'Incorrect email').isEmail(),
@@ -32,14 +38,20 @@ router.post('/',
     usersPost
 );
 router.put('/:id',
+    validateJWTAdmin,
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom(existsUserById),
     check('role').custom(isValidRole),
     validateFields,
     usersPut
 );
-router.patch('/:id', usersPatch);
+router.patch('/:id',
+    validateJWTAdmin,
+    validateFields,
+    usersPatch
+);
 router.delete('/:id',
+    validateJWTAdmin,
     check('id', 'Invalid ID').isMongoId(),
     check('id').custom(existsUserById),
     validateFields,
